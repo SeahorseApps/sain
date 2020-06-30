@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Azmoon</string>
+    <string name="app_version">v1.3.0</string>
+
+    <string name="OAuthClientKey">FH2RCCVPlkrD0luSaarcBf7AisQa</string>
+    <string name="OAuthSecret">fIZwhKsJaHrwVZI9VEQY8y8EJ08a</string>
+    <string name="OAuthTokenEndPoint">https://5.9.228.169:9443/oauth2/token</string>
+    <string name="OAuthIntrospectEndPoint">https://5.9.228.169:9443/oauth2/introspect</string>
+    <string name="OAuthAuthenticationEndPoint">https://5.9.228.169:9443/oauth2/authorize</string>
+    <string name="OAuthUserInfoEndPoint">https://5.9.228.169:9443/oauth2/userinfo</string>
+    <string name="OAuthRevokeTokenEndPoint">https://5.9.228.169:9443/oauth2/revoke</string>
+
+    <string name="welcome_guest">کاربر مهمان، خوش آمدید</string>
+    <string name="loading">لطفا صبر کنید</string>
+</resources>
