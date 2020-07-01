@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.sain.azmoon.auth.Authentication;
+import com.sain.azmoon.fragments.MainPagerAdapter;
 import com.sain.azmoon.helpers.AppLog;
 import com.sain.azmoon.helpers.NukeSSLCerts;
 import com.sain.azmoon.helpers.Utils;
@@ -30,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     private TextView welcomeText;
     private Button loginButton;
     private ProgressBar loadingPB;
+    private TextView endpointSettingsButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,6 +50,13 @@ public class MainActivity extends AppCompatActivity
         welcomeText = findViewById(R.id.welcomeText);
         loginButton = findViewById(R.id.loginButton);
         loadingPB = findViewById(R.id.loadingProgressbar);
+        endpointSettingsButton = findViewById(R.id.endpointSettingsButton);
+
+        endpointSettingsButton.setOnClickListener(v ->
+        {
+            Intent intent = new Intent(MainActivity.this, EndpointSettingsActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void tryAuthenticate()

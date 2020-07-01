@@ -32,7 +32,7 @@
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/appVersionText"
+        app:layout_constraintBottom_toTopOf="@+id/endpointSettingsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -65,4 +65,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/welcomeText"
         app:srcCompat="@drawable/logo" />
+
+    <TextView
+        android:id="@+id/endpointSettingsButton"
+        android:layout_width="100dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="bottom|right"
+        android:text="تنظیمات"
+        android:textAlignment="textStart"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

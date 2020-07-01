@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.sain.azmoon.MainActivity;
 import com.sain.azmoon.R;
@@ -67,8 +68,8 @@ public class Authentication
 
     public Authentication(Context context)
     {
-        authEndPoint = EndPointUriProcessor.getOAuthAuthenticationEndPoint(context);
-        tokenEndPoint = EndPointUriProcessor.getOAuthTokenEndPoint(context);
+        authEndPoint = EndPointUriProcessor.getEndPointUri(context, EndPointUriProcessor.AuthenticationEndPoint_ID);
+        tokenEndPoint = EndPointUriProcessor.getEndPointUri(context, EndPointUriProcessor.TokenEndPoint_ID);
         clientId = context.getResources().getString(R.string.OAuthClientKey);
         secretKey = context.getResources().getString(R.string.OAuthSecret);
 
@@ -138,6 +139,11 @@ public class Authentication
         writeAuthState(context);
 
         AppLog.i(TAG, "AuthState Reset");
+    }
+
+    public void performActionWithFreshTokens(@NonNull AuthState.AuthStateAction action)
+    {
+        authState.performActionWithFreshTokens(authService, action);
     }
 
     public void requestToken(AuthorizationResponse response)

@@ -4,88 +4,104 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.sain.azmoon.R;
+import com.sain.azmoon.models.EndpointDataModel;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
 public final class EndPointUriProcessor
 {
+    private static final String TAG="EndPointUriProcessor";
     private static final String prefName = "EndPoints";
-    private static final String oAuthTokenEndPoint_ID = "OAuthTokenEndPoint";
-    private static final String oAuthIntrospectEndPoint_ID = "OAuthIntrospectEndPoint";
-    private static final String oAuthAuthenticationEndPoint_ID = "OAuthAuthenticationEndPoint";
-    private static final String oAuthUserInfoEndPoint_ID = "OAuthUserInfoEndPoint";
-    private static final String oAuthRevokeTokenEndPoint_ID = "OAuthRevokeTokenEndPoint";
 
-    public static String getOAuthTokenEndPoint(Context context)
+    public static final int TokenEndPoint_ID = 1;
+    public static final int IntrospectEndPoint_ID = 2;
+    public static final int AuthenticationEndPoint_ID = 3;
+    public static final int UserInfoEndPoint_ID = 4;
+    public static final int RevokeTokenEndPoint_ID = 5;
+
+    private static final Map<Integer, String> endpoints=new HashMap<Integer, String>()
+    {{
+        put(TokenEndPoint_ID, "OAuthTokenEndPoint");
+        put(IntrospectEndPoint_ID, "OAuthIntrospectEndPoint");
+        put(AuthenticationEndPoint_ID, "OAuthAuthenticationEndPoint");
+        put(UserInfoEndPoint_ID, "OAuthUserInfoEndPoint");
+        put(RevokeTokenEndPoint_ID, "OAuthRevokeTokenEndPoint");
+    }};
+
+    public static int[] getIds()
     {
-        String saved = getSavedEndPoint(context, oAuthTokenEndPoint_ID);
+        Set<Integer> keys = endpoints.keySet();
+        int[] result = new int[keys.size()];
+        int index = 0;
 
-        return saved == null ? context.getResources().getString(R.string.OAuthTokenEndPoint) : saved;
+        for (Integer item : keys)
+            result[index++] = item;
+
+        return result;
     }
 
-    public static void setOAuthTokenEndPoint(Context context, String uri)
+    public static String getEndpointName(int id)
     {
-        setSavedEndPoint(context, oAuthTokenEndPoint_ID, uri);
+        return endpoints.get(id);
     }
 
-    public static String getOAuthIntrospectEndPoint(Context context)
-    {
-        String saved = getSavedEndPoint(context, oAuthIntrospectEndPoint_ID);
-
-        return saved == null ? context.getResources().getString(R.string.OAuthIntrospectEndPoint) : saved;
-    }
-
-    public static void setOAuthIntrospectEndPoint(Context context, String uri)
-    {
-        setSavedEndPoint(context, oAuthIntrospectEndPoint_ID, uri);
-    }
-
-    public static String getOAuthAuthenticationEndPoint(Context context)
-    {
-        String saved = getSavedEndPoint(context, oAuthAuthenticationEndPoint_ID);
-
-        return saved == null ? context.getResources().getString(R.string.OAuthAuthenticationEndPoint) : saved;
-    }
-
-    public static void setOAuthAuthenticationEndPoint(Context context, String uri)
-    {
-        setSavedEndPoint(context, oAuthAuthenticationEndPoint_ID, uri);
-    }
-
-    public static String getOAuthUserInfoEndPoint(Context context)
-    {
-        String saved = getSavedEndPoint(context, oAuthUserInfoEndPoint_ID);
-
-        return saved == null ? context.getResources().getString(R.string.OAuthUserInfoEndPoint) : saved;
-    }
-
-    public static void setOAuthUserInfoEndPoint(Context context, String uri)
-    {
-        setSavedEndPoint(context, oAuthUserInfoEndPoint_ID, uri);
-    }
-
-    public static String getOAuthRevokeTokenEndPoint(Context context)
-    {
-        String saved = getSavedEndPoint(context, oAuthRevokeTokenEndPoint_ID);
-
-        return saved == null ? context.getResources().getString(R.string.OAuthRevokeTokenEndPoint) : saved;
-    }
-
-    public static void setOAuthRevokeTokenEndPoint(Context context, String uri)
-    {
-        setSavedEndPoint(context, oAuthRevokeTokenEndPoint_ID, uri);
-    }
-
-    private static String getSavedEndPoint(Context context, String endpoint)
+    public static String getEndPointUri(Context context, int endpointId)
     {
         SharedPreferences sp = context.getSharedPreferences(prefName, MODE_PRIVATE);
-        return sp.getString(endpoint, null);
+        String saved = sp.getString(endpoints.get(endpointId), null);
+
+        if (saved == null)
+        {
+            if (endpointId == TokenEndPoint_ID)
+                return context.getResources().getString(R.string.OAuthTokenEndPoint);
+
+            if (endpointId == IntrospectEndPoint_ID)
+                return context.getResources().getString(R.string.OAuthIntrospectEndPoint);
+
+            if (endpointId == AuthenticationEndPoint_ID)
+                return context.getResources().getString(R.string.OAuthAuthenticationEndPoint);
+
+            if (endpointId == UserInfoEndPoint_ID)
+                return context.getResources().getString(R.string.OAuthUserInfoEndPoint);
+
+            if (endpointId == RevokeTokenEndPoint_ID)
+                return context.getResources().getString(R.string.OAuthRevokeTokenEndPoint);
+
+            AppLog.e(TAG, "Endpoint Uri Not Found");
+        }
+
+        return saved;
     }
 
-    private static void setSavedEndPoint(Context context, String endpoint, String uri)
+    public static void setSavedEndPoint(Context context, int endpointId, String uri)
     {
         SharedPreferences.Editor editor = context.getSharedPreferences(prefName, MODE_PRIVATE).edit();
-        editor.putString(endpoint, uri);
+        editor.putString(endpoints.get(endpointId), uri);
         editor.apply();
+    }
+
+    public static void setSavedEndPoint(Context context, String endpointName, String uri)
+    {
+        SharedPreferences.Editor editor = context.getSharedPreferences(prefName, MODE_PRIVATE).edit();
+        editor.putString(endpointName, uri);
+        editor.apply();
+    }
+
+    public static EndpointDataModel[] getListViewItems(Context context)
+    {
+        EndpointDataModel[] result = new EndpointDataModel[endpoints.size()];
+
+        int i = 0;
+        for (Map.Entry<Integer, String> entry : endpoints.entrySet())
+        {
+            result[i] = new EndpointDataModel(entry.getValue(), getEndPointUri(context, entry.getKey()));
+            i++;
+        }
+
+        return result;
     }
 }

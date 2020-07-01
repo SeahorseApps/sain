@@ -27,6 +27,9 @@ import com.sain.azmoon.helpers.EndPointUriProcessor;
 import com.sain.azmoon.helpers.Utils;
 import com.sain.azmoon.helpers.VolleySingleton;
 
+import net.openid.appauth.AuthState;
+import net.openid.appauth.AuthorizationException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,6 +63,7 @@ public class ProfileFragment extends Fragment
         initUi(view);
 
         auth = new Authentication(Objects.requireNonNull(getActivity()));
+        Log.d(TAG, "onCreateView: " + auth.getAccessToken());
         fetchUserInfo();
 
         return view;
@@ -84,59 +88,62 @@ public class ProfileFragment extends Fragment
 
     private void fetchUserInfo()
     {
-        StringRequest request = new StringRequest(Request.Method.POST, EndPointUriProcessor.getOAuthUserInfoEndPoint(getActivity()),
-                response ->
-                {
-                    if (response != null)
-                    {
-                        AppLog.i(TAG, "Successfully Received Profile Info");
-                        AppLog.i(TAG, "User Profile JSON:" + response);
-
-                        try
-                        {
-                            JSONObject json = new JSONObject(response);
-
-                            if (json.has("sub"))
-                                usernameText.setText(json.getString("sub"));
-
-                            if (json.has("country"))
-                                countryText.setText(json.getString("country"));
-
-                            if (json.has("groups"))
-                                roleText.setText(json.getString("groups"));
-
-                            if (json.has("given_name"))
-                                firstNameText.setText(json.getString("given_name"));
-
-                            if (json.has("family_name"))
-                                lastNameText.setText(json.getString("family_name"));
-                        }
-                        catch (JSONException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                error ->
-                {
-                    AppLog.i(TAG, "Error Fetching Profile Info");
-
-                    if (error != null)
-                        AppLog.e(TAG, "Error Message: " + (error.getMessage() != null ? error.getMessage() : "NULL"));
-                })
+        auth.performActionWithFreshTokens((accessToken, idToken, ex) ->
         {
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError
+            StringRequest request = new StringRequest(Request.Method.POST, EndPointUriProcessor.getEndPointUri(Objects.requireNonNull(getActivity()), EndPointUriProcessor.UserInfoEndPoint_ID),
+                    response ->
+                    {
+                        if (response != null)
+                        {
+                            AppLog.i(TAG, "Successfully Received Profile Info");
+                            AppLog.i(TAG, "User Profile JSON:" + response);
+
+                            try
+                            {
+                                JSONObject json = new JSONObject(response);
+
+                                if (json.has("sub"))
+                                    usernameText.setText(json.getString("sub"));
+
+                                if (json.has("country"))
+                                    countryText.setText(json.getString("country"));
+
+                                if (json.has("groups"))
+                                    roleText.setText(json.getString("groups"));
+
+                                if (json.has("given_name"))
+                                    firstNameText.setText(json.getString("given_name"));
+
+                                if (json.has("family_name"))
+                                    lastNameText.setText(json.getString("family_name"));
+                            }
+                            catch (JSONException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    error ->
+                    {
+                        AppLog.i(TAG, "Error Fetching Profile Info");
+
+                        if (error != null)
+                            AppLog.e(TAG, "Error Message: " + (error.getMessage() != null ? error.getMessage() : "NULL"));
+                    })
             {
-                HashMap<String, String> headers = new HashMap<>();
-                headers.put("Authorization", "Bearer " + auth.getAccessToken());
+                @Override
+                public Map<String, String> getHeaders()
+                {
+                    HashMap<String, String> headers = new HashMap<>();
+                    headers.put("Authorization", "Bearer " + accessToken);
 
-                return headers;
-            }
-        };
+                    return headers;
+                }
+            };
 
-        AppLog.i(TAG, "Requesting User Profile Info");
-        VolleySingleton.getInstance(getActivity()).addToQueue(request);
+            AppLog.i(TAG, "Requesting User Profile Info");
+            VolleySingleton.getInstance(getActivity()).addToQueue(request);
+        });
     }
 
     private void logoutButtonClicked(View v)
@@ -144,63 +151,66 @@ public class ProfileFragment extends Fragment
         Utils.showMessageBoxYesNo(getActivity(), "خروج", "میخواهید خارج شوید؟",
                 (dlg, w) ->
                 {
-                    StringRequest request = new StringRequest(Request.Method.POST, EndPointUriProcessor.getOAuthRevokeTokenEndPoint(getActivity()),
-                            response ->
-                            {
-                                AppLog.i(TAG, "Successfully Revoked The Token");
-                                AppLog.i(TAG, "Clearing Saved AuthState...");
-
-                                auth.resetState(getActivity());
-
-                                AppLog.i(TAG, "Returning to Start Activity");
-                                Intent intent = new Intent(getActivity(), MainActivity.class);
-                                startActivity(intent);
-
-                                Objects.requireNonNull(getActivity()).finish();
-                            },
-                            error ->
-                            {
-                                AppLog.e(TAG, "Error Revoking Token");
-
-                                if (error != null)
-                                    AppLog.e(TAG, "Error Message: " + (error.getMessage() != null ? error.getMessage() : "NULL"));
-                                else
-                                    AppLog.e(TAG, "Error is NULL");
-                            })
+                    auth.performActionWithFreshTokens((accessToken, idToken, ex) ->
                     {
-                        @Override
-                        public String getBodyContentType()
+                        StringRequest request = new StringRequest(Request.Method.POST, EndPointUriProcessor.getEndPointUri(Objects.requireNonNull(getActivity()), EndPointUriProcessor.RevokeTokenEndPoint_ID),
+                                response ->
+                                {
+                                    AppLog.i(TAG, "Successfully Revoked The Token");
+                                    AppLog.i(TAG, "Clearing Saved AuthState...");
+
+                                    auth.resetState(getActivity());
+
+                                    AppLog.i(TAG, "Returning to Start Activity");
+                                    Intent intent = new Intent(getActivity(), MainActivity.class);
+                                    startActivity(intent);
+
+                                    Objects.requireNonNull(getActivity()).finish();
+                                },
+                                error ->
+                                {
+                                    AppLog.e(TAG, "Error Revoking Token");
+
+                                    if (error != null)
+                                        AppLog.e(TAG, "Error Message: " + (error.getMessage() != null ? error.getMessage() : "NULL"));
+                                    else
+                                        AppLog.e(TAG, "Error is NULL");
+                                })
                         {
-                            return "application/x-www-form-urlencoded; charset=UTF-8";
-                        }
+                            @Override
+                            public String getBodyContentType()
+                            {
+                                return "application/x-www-form-urlencoded; charset=UTF-8";
+                            }
 
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError
-                        {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("token", auth.getCurrentAuthState().getAccessToken());
+                            @Override
+                            protected Map<String, String> getParams()
+                            {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("token", accessToken);
 
-                            return params;
-                        }
+                                return params;
+                            }
 
-                        @Override
-                        public Map<String, String> getHeaders()
-                        {
-                            String credentials = auth.getClientId() + ":" + auth.getSecretKey();
-                            String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
+                            @Override
+                            public Map<String, String> getHeaders()
+                            {
+                                String credentials = auth.getClientId() + ":" + auth.getSecretKey();
+                                String base64EncodedCredentials = Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
 
-                            final Map<String, String> headers = new HashMap<>();
-                            headers.put("Authorization", "Basic " + base64EncodedCredentials);
-                            headers.put("Content-Type", "application/x-www-form-urlencoded");
+                                final Map<String, String> headers = new HashMap<>();
+                                headers.put("Authorization", "Basic " + base64EncodedCredentials);
+                                headers.put("Content-Type", "application/x-www-form-urlencoded");
 
-                            return headers;
-                        }
-                    };
+                                return headers;
+                            }
+                        };
 
-                    AppLog.i(TAG, "Requesting Token Revoke");
-                    VolleySingleton.getInstance(getActivity()).addToQueue(request);
+                        AppLog.i(TAG, "Requesting Token Revoke");
+                        VolleySingleton.getInstance(getActivity()).addToQueue(request);
 
-                    dlg.dismiss();
+                        dlg.dismiss();
+                    });
                 },
                 (dlg, w) ->
                 {
