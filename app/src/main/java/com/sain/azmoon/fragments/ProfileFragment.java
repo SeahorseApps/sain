@@ -3,8 +3,6 @@ package com.sain.azmoon.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.EventLogTags;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +13,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.StringRequest;
 import com.sain.azmoon.MainActivity;
 import com.sain.azmoon.R;
-import com.sain.azmoon.UserInfoActivity;
-import com.sain.azmoon.auth.Authentication;
+import com.sain.azmoon.service.AppAuthAuthentication;
 import com.sain.azmoon.helpers.AppLog;
 import com.sain.azmoon.helpers.EndPointUriProcessor;
 import com.sain.azmoon.helpers.Utils;
 import com.sain.azmoon.helpers.VolleySingleton;
-
-import net.openid.appauth.AuthState;
-import net.openid.appauth.AuthorizationException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,7 +46,7 @@ public class ProfileFragment extends Fragment
     private TextView roleText;
     private Button logoutButton;
 
-    private Authentication auth;
+    private AppAuthAuthentication auth;
 
     @Nullable
     @Override
@@ -62,8 +55,7 @@ public class ProfileFragment extends Fragment
         View view = inflater.inflate(R.layout.fragment_user_info, container, false);
         initUi(view);
 
-        auth = new Authentication(Objects.requireNonNull(getActivity()));
-        Log.d(TAG, "onCreateView: " + auth.getAccessToken());
+        auth = new AppAuthAuthentication(Objects.requireNonNull(getActivity()));
         fetchUserInfo();
 
         return view;

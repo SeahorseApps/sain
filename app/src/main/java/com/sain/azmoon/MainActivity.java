@@ -2,22 +2,18 @@ package com.sain.azmoon;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.audiofx.DynamicsProcessing;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.sain.azmoon.auth.Authentication;
-import com.sain.azmoon.fragments.MainPagerAdapter;
+import com.sain.azmoon.service.AppAuthAuthentication;
 import com.sain.azmoon.helpers.AppLog;
 import com.sain.azmoon.helpers.NukeSSLCerts;
 import com.sain.azmoon.helpers.Utils;
+import com.sain.azmoon.service.IAuthenticationService;
 
 import net.openid.appauth.AuthorizationException;
 import net.openid.appauth.AuthorizationResponse;
@@ -25,9 +21,9 @@ import net.openid.appauth.TokenResponse;
 
 public class MainActivity extends AppCompatActivity
 {
-    private final String TAG = "LOGIN";
+    private final String TAG = "MainActivity";
 
-    private Authentication auth;
+    private IAuthenticationService<AuthorizationResponse, TokenResponse, AuthorizationException> auth;
 
     private TextView welcomeText;
     private Button loginButton;
@@ -61,14 +57,14 @@ public class MainActivity extends AppCompatActivity
 
     private void tryAuthenticate()
     {
-        auth = new Authentication(this);
+        auth = new AppAuthAuthentication(this);
         auth.setOnTokenReceivedListener(this::tokenReceived);
 
-        if (auth.isAuthStateValid())     //Previous authentication data exists and not expired
+        if (auth.isAuthorized())     //Previous authentication data exists and not expired
         {
             AppLog.i(TAG, "Found valid authentication. Requesting token");
 
-            auth.requestToken();
+            auth.requestTokenRefresh();
             setUI(1);
         }
 
@@ -84,7 +80,7 @@ public class MainActivity extends AppCompatActivity
     private void loginButtonClicked(View v)
     {
         setUI(1);
-        startActivityForResult(auth.getAuthIntent(), Authentication.AUTH_RESPONSE_CODE);
+        startActivityForResult(auth.getAuthBrowserIntent(), AppAuthAuthentication.AUTH_RESPONSE_CODE);
     }
 
     private void setUI(int state)
@@ -109,19 +105,19 @@ public class MainActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == Authentication.AUTH_RESPONSE_CODE)   //Return from browser login
+        if (requestCode == AppAuthAuthentication.AUTH_RESPONSE_CODE)   //Return from browser login
         {
             AuthorizationResponse resp = AuthorizationResponse.fromIntent(data);
             AuthorizationException ex = AuthorizationException.fromIntent(data);
 
-            auth.updateState(this, resp, ex);
+            auth.updateStateWithNewAuthorization(this, resp, ex);
 
             if (resp != null)   //User has logged in
             {
                 AppLog.i(TAG, "Response from browser : AuthCode=" + resp.authorizationCode);
                 AppLog.i(TAG, "Requesting Access Token now");
 
-                auth.requestToken(resp);
+                auth.requestTokenExchange(resp);
             }
             else
             {
@@ -138,7 +134,7 @@ public class MainActivity extends AppCompatActivity
             AppLog.i(TAG, "Token Received : AccessToken=" + resp.accessToken);
             AppLog.i(TAG, "Token Received : RefreshToken=" + resp.refreshToken);
 
-            auth.updateState(this, resp, ex);
+            auth.updateStateWithNewToken(this, resp, ex);
 
             Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
             startActivity(intent);
