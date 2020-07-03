@@ -22,6 +22,11 @@ import com.sain.azmoon.helpers.AppLog;
 import com.sain.azmoon.helpers.EndPointUriProcessor;
 import com.sain.azmoon.helpers.Utils;
 import com.sain.azmoon.helpers.VolleySingleton;
+import com.sain.azmoon.service.IAuthenticationService;
+
+import net.openid.appauth.AuthorizationException;
+import net.openid.appauth.AuthorizationResponse;
+import net.openid.appauth.TokenResponse;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,7 +51,7 @@ public class ProfileFragment extends Fragment
     private TextView roleText;
     private Button logoutButton;
 
-    private AppAuthAuthentication auth;
+    private IAuthenticationService<AuthorizationResponse, TokenResponse, AuthorizationException> auth;
 
     @Nullable
     @Override
@@ -108,6 +113,18 @@ public class ProfileFragment extends Fragment
 
                                 if (json.has("family_name"))
                                     lastNameText.setText(json.getString("family_name"));
+
+                                if(json.has("user_email"))
+                                    emailText.setText(json.getString("user_email"));
+
+                                if(json.has("user_organization"))
+                                    organizationText.setText(json.getString("user_organization"));
+
+                                if(json.has("user_mobile"))
+                                    mobileText.setText(json.getString("user_mobile"));
+
+                                if(json.has("phone_number"))
+                                    phoneText.setText(json.getString("phone_number"));
                             }
                             catch (JSONException e)
                             {

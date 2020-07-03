@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity
 {
     private final String TAG = "MainActivity";
 
+    private boolean hasTokenRefreshed=false;
     private IAuthenticationService<AuthorizationResponse, TokenResponse, AuthorizationException> auth;
 
     private TextView welcomeText;
@@ -135,6 +136,14 @@ public class MainActivity extends AppCompatActivity
             AppLog.i(TAG, "Token Received : RefreshToken=" + resp.refreshToken);
 
             auth.updateStateWithNewToken(this, resp, ex);
+
+            //Refresh token To get full profile info
+            if(!hasTokenRefreshed)
+            {
+                hasTokenRefreshed = true;
+                auth.requestTokenRefresh();
+                return;
+            }
 
             Intent intent = new Intent(MainActivity.this, UserInfoActivity.class);
             startActivity(intent);

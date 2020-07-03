@@ -8,11 +8,13 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 
 import com.sain.azmoon.R;
+import com.sain.azmoon.helpers.PackageInspector;
 import com.sain.azmoon.models.interfaces.AuthorizationAction;
 import com.sain.azmoon.events.TokenReceivedListener;
 import com.sain.azmoon.helpers.AppLog;
 import com.sain.azmoon.helpers.EndPointUriProcessor;
 
+import net.openid.appauth.AppAuthConfiguration;
 import net.openid.appauth.AuthState;
 import net.openid.appauth.AuthorizationException;
 import net.openid.appauth.AuthorizationRequest;
@@ -21,6 +23,8 @@ import net.openid.appauth.AuthorizationService;
 import net.openid.appauth.AuthorizationServiceConfiguration;
 import net.openid.appauth.ResponseTypeValues;
 import net.openid.appauth.TokenResponse;
+import net.openid.appauth.browser.BrowserWhitelist;
+import net.openid.appauth.browser.VersionedBrowserMatcher;
 
 import org.json.JSONException;
 
@@ -61,7 +65,7 @@ public class AppAuthAuthentication implements IAuthenticationService<Authorizati
         secretKey = context.getResources().getString(R.string.OAuthSecret);
 
         AppLog.i(TAG, "Creating Authorization Service");
-        authService = new AuthorizationService(context);
+        authService = new AuthorizationService(context, getConfig(context));
 
         serviceConfig = new AuthorizationServiceConfiguration(Uri.parse(authEndPoint), Uri.parse(tokenEndPoint));
         AuthorizationRequest.Builder authRequestBuilder = new AuthorizationRequest.Builder(serviceConfig, clientId, ResponseTypeValues.CODE, Uri.parse(REDIRECT_URI));
@@ -73,6 +77,19 @@ public class AppAuthAuthentication implements IAuthenticationService<Authorizati
 
         AppLog.i(TAG, prevState == null ? "Saved State Not Found. Creating New One" : "Saved State Found. Loading Saved Data");
         authState = prevState == null ? new AuthState(serviceConfig) : prevState;
+    }
+
+    private AppAuthConfiguration getConfig(Context context)
+    {
+        AppAuthConfiguration.Builder builder = new AppAuthConfiguration.Builder();
+
+        if(PackageInspector.isChromeInstalled(context.getPackageManager()))
+            builder.setBrowserMatcher(new BrowserWhitelist(VersionedBrowserMatcher.CHROME_BROWSER));
+
+        else if(PackageInspector.isFireFoxInstalled(context.getPackageManager()))
+            builder.setBrowserMatcher(new BrowserWhitelist(VersionedBrowserMatcher.FIREFOX_BROWSER));
+
+        return builder.build();
     }
 
     public String getClientId()
