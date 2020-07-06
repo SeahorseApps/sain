@@ -31,6 +31,7 @@ import net.openid.appauth.TokenResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -100,31 +101,31 @@ public class ProfileFragment extends Fragment
                                 JSONObject json = new JSONObject(response);
 
                                 if (json.has("sub"))
-                                    usernameText.setText(json.getString("sub"));
+                                    usernameText.setText(getUnicode(json.getString("sub")));
 
                                 if (json.has("country"))
-                                    countryText.setText(json.getString("country"));
+                                    countryText.setText(getUnicode(json.getString("country")));
 
                                 if (json.has("groups"))
-                                    roleText.setText(json.getString("groups"));
+                                    roleText.setText(getUnicode(json.getString("groups")));
 
                                 if (json.has("given_name"))
-                                    firstNameText.setText(json.getString("given_name"));
+                                    firstNameText.setText(getUnicode(json.getString("given_name")));
 
                                 if (json.has("family_name"))
-                                    lastNameText.setText(json.getString("family_name"));
+                                    lastNameText.setText(getUnicode(json.getString("family_name")));
 
                                 if(json.has("user_email"))
-                                    emailText.setText(json.getString("user_email"));
+                                    emailText.setText(getUnicode(json.getString("user_email")));
 
                                 if(json.has("user_organization"))
-                                    organizationText.setText(json.getString("user_organization"));
+                                    organizationText.setText(getUnicode(json.getString("user_organization")));
 
                                 if(json.has("user_mobile"))
-                                    mobileText.setText(json.getString("user_mobile"));
+                                    mobileText.setText(getUnicode(json.getString("user_mobile")));
 
                                 if(json.has("phone_number"))
-                                    phoneText.setText(json.getString("phone_number"));
+                                    phoneText.setText(getUnicode(json.getString("phone_number")));
                             }
                             catch (JSONException e)
                             {
@@ -153,6 +154,19 @@ public class ProfileFragment extends Fragment
             AppLog.i(TAG, "Requesting User Profile Info");
             VolleySingleton.getInstance(getActivity()).addToQueue(request);
         });
+    }
+
+    private String getUnicode(String input)
+    {
+        try
+        {
+            return new String(input.getBytes("ISO-8859-1"), "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void logoutButtonClicked(View v)

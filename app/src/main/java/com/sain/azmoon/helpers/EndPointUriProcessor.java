@@ -25,11 +25,11 @@ public final class EndPointUriProcessor
 
     private static final Map<Integer, String> endpoints=new HashMap<Integer, String>()
     {{
-        put(TokenEndPoint_ID, "OAuthTokenEndPoint");
-        put(IntrospectEndPoint_ID, "OAuthIntrospectEndPoint");
-        put(AuthenticationEndPoint_ID, "OAuthAuthenticationEndPoint");
-        put(UserInfoEndPoint_ID, "OAuthUserInfoEndPoint");
-        put(RevokeTokenEndPoint_ID, "OAuthRevokeTokenEndPoint");
+        put(TokenEndPoint_ID, "TokenEndPoint");
+        put(IntrospectEndPoint_ID, "IntrospectEndPoint");
+        put(AuthenticationEndPoint_ID, "AuthenticationEndPoint");
+        put(UserInfoEndPoint_ID, "UserInfoEndPoint");
+        put(RevokeTokenEndPoint_ID, "RevokeTokenEndPoint");
     }};
 
     public static int[] getIds()
