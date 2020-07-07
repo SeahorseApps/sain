@@ -57,19 +57,19 @@ public final class EndPointUriProcessor
         if (saved == null)
         {
             if (endpointId == TokenEndPoint_ID)
-                return context.getResources().getString(R.string.OAuthTokenEndPoint);
+                return context.getResources().getString(R.string.TokenEndPointUri);
 
             if (endpointId == IntrospectEndPoint_ID)
-                return context.getResources().getString(R.string.OAuthIntrospectEndPoint);
+                return context.getResources().getString(R.string.IntrospectEndPointUri);
 
             if (endpointId == AuthenticationEndPoint_ID)
-                return context.getResources().getString(R.string.OAuthAuthenticationEndPoint);
+                return context.getResources().getString(R.string.AuthenticationEndPointUri);
 
             if (endpointId == UserInfoEndPoint_ID)
-                return context.getResources().getString(R.string.OAuthUserInfoEndPoint);
+                return context.getResources().getString(R.string.UserInfoEndPointUri);
 
             if (endpointId == RevokeTokenEndPoint_ID)
-                return context.getResources().getString(R.string.OAuthRevokeTokenEndPoint);
+                return context.getResources().getString(R.string.RevokeTokenEndPointUri);
 
             AppLog.e(TAG, "Endpoint Uri Not Found");
         }

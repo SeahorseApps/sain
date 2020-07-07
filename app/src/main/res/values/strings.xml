@@ -2,13 +2,13 @@
     <string name="app_name">Azmoon</string>
     <string name="app_version">v1.3.0</string>
 
-    <string name="OAuthClientKey">Sa17D9mexZVQzINjov3nUFlJFkIa</string>
-    <string name="OAuthSecret">NCuOxkG6OBag0Kv2pjn1o_zDTewa</string>
-    <string name="OAuthTokenEndPoint">https://5.9.228.169:9443/oauth2/token</string>
-    <string name="OAuthIntrospectEndPoint">https://5.9.228.169:9443/oauth2/introspect</string>
-    <string name="OAuthAuthenticationEndPoint">https://5.9.228.169:9443/oauth2/authorize</string>
-    <string name="OAuthUserInfoEndPoint">https://5.9.228.169:9443/oauth2/userinfo</string>
-    <string name="OAuthRevokeTokenEndPoint">https://5.9.228.169:9443/oauth2/revoke</string>
+    <string name="ClientKey">Sa17D9mexZVQzINjov3nUFlJFkIa</string>
+    <string name="Secret">NCuOxkG6OBag0Kv2pjn1o_zDTewa</string>
+    <string name="TokenEndPointUri">https://5.9.228.169:9443/oauth2/token</string>
+    <string name="IntrospectEndPointUri">https://5.9.228.169:9443/oauth2/introspect</string>
+    <string name="AuthenticationEndPointUri">https://5.9.228.169:9443/oauth2/authorize</string>
+    <string name="UserInfoEndPointUri">https://5.9.228.169:9443/oauth2/userinfo</string>
+    <string name="RevokeTokenEndPointUri">https://5.9.228.169:9443/oauth2/revoke</string>
 
     <string name="welcome_guest">کاربر مهمان، خوش آمدید</string>
     <string name="loading">لطفا صبر کنید</string>

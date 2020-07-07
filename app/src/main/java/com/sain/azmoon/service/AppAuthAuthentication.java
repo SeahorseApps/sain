@@ -61,8 +61,8 @@ public class AppAuthAuthentication implements IAuthenticationService<Authorizati
     {
         authEndPoint = EndPointUriProcessor.getEndPointUri(context, EndPointUriProcessor.AuthenticationEndPoint_ID);
         tokenEndPoint = EndPointUriProcessor.getEndPointUri(context, EndPointUriProcessor.TokenEndPoint_ID);
-        clientId = context.getResources().getString(R.string.OAuthClientKey);
-        secretKey = context.getResources().getString(R.string.OAuthSecret);
+        clientId = context.getResources().getString(R.string.ClientKey);
+        secretKey = context.getResources().getString(R.string.Secret);
 
         AppLog.i(TAG, "Creating Authorization Service");
         authService = new AuthorizationService(context, getConfig(context));
